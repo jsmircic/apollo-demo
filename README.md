@@ -4,7 +4,7 @@ Mostly for training/learning purposes, a minimal GraphQL server using Apollo lib
 
 ### How to start
 
-`git clone https://github.com/jsmiric/...`
+`git clone https://github.com/jsmircic/apollo-demo`
 
 `yarn install`
 
