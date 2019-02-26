@@ -1,0 +1,30 @@
+{
+  "name": "apollo-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build-dev": "webpack --config webpack.development.js",
+    "start": "concurrently --kill-others  \"npm run build-dev\" \"npm run start:env\"",
+    "start:env": "node --require dotenv/config dist/main"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/webpack-env": "^1.13.7",
+    "clean-webpack-plugin": "^1.0.1",
+    "concurrently": "^4.1.0",
+    "dotenv": "^6.2.0",
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.3.3333",
+    "webpack": "^4.29.5",
+    "webpack-cli": "^3.2.3",
+    "webpack-merge": "^4.2.1",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "dependencies": {
+    "apollo-server": "^2.4.8",
+    "graphql": "^14.1.1"
+  }
+}
