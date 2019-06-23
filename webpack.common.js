@@ -7,6 +7,11 @@ module.exports = {
         exclude: [path.resolve(__dirname, "node_modules")],
         test: /\.ts$/,
         use: "ts-loader"
+      },
+      {
+        test: /\.mjs$/,
+        include: /node_modules/,
+        type: "javascript/auto"
       }
     ]
   },
@@ -15,7 +20,7 @@ module.exports = {
     path: path.resolve(__dirname, "dist")
   },
   resolve: {
-    extensions: [".ts", ".js"]
+    extensions: [".webpack.js", ".web.js", ".mjs", ".js", ".json", ".ts", ".js"]
   },
   target: "node"
 };

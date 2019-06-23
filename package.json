@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build-dev": "webpack --config webpack.development.js",
+    "build-prod": "webpack --config webpack.production.js",
     "start": "concurrently --kill-others  \"npm run build-dev\" \"npm run start:env\"",
     "start:env": "node --require dotenv/config dist/main"
   },
@@ -25,9 +26,10 @@
   },
   "dependencies": {
     "@types/mssql": "^4.0.15",
-    "apollo-server": "^2.4.8",
+    "apollo-server": "^2.6.4",
     "dataloader": "^1.4.0",
-    "graphql": "^14.1.1",
+    "graphql": "^14.3.1",
+    "graphql-iso-date": "^3.6.1",
     "mssql": "^5.1.0",
     "realm": "^2.29.0-alpha.1"
   }

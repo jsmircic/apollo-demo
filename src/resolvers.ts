@@ -1,76 +1,74 @@
-import { openRealm } from "./db/realm";
-import * as sql from "mssql";
-
-let pool: sql.ConnectionPool;
-
-const connectToPool = async () => {
-  if (pool) return;
-
-  pool = new sql.ConnectionPool({
-    server: "128.1.0.27\\v2017",
-    user: "f4b_appuser",
-    password: "P4p&4t#1cA",
-    database: "DocSysJLTest"
-  });
-
-  await pool.connect();
-};
-
 export default {
   Query: {
-    vessels: async () => {
-      await connectToPool();
-      const results = await pool.query`SELECT BpCode AS id,BpName as name from dbo.BussPart bp WHERE bp.BpTyp=1600`;
-      return results.recordset;
+    vessels: async (_parent, _, context) => {
+      const results = await context.f4bDs.queryVessels();
+      return results;
     },
-
-    lines: async () => {
-      await connectToPool();
-      const results = await pool.query`SELECT l.LinijaOznaka as id, l.LinijaNaziv as name FROM BOOK.LinijaGlava l ORDER BY l.LinijaOznaka`;
-      return results.recordset;
+    lines: async (_parent, _, context) => {
+      const results = await context.f4bDs.queryLines();
+      return results;
     },
-    islands: async () => {
-      await connectToPool();
-      const results = await pool.query`SELECT BpCode AS id,BpName as name from dbo.BussPart bp WHERE bp.BpTyp=1500`;
-      return results.recordset;
+    islands: async (_parent, _, context) => {
+      const results = await context.f4bDs.queryIslands();
+      return results;
     },
-    ports: async () => {
-      await connectToPool();
-      const results = await pool.query`SELECT p.PostajaOznaka as id,p.PostajaNaziv as name, p.PostajaAdresa  as CIMISId FROM BOOK.PostajaGlava p ORDER by p.PostajaOznaka`;
-
-      return results.recordset;
+    ports: async (_parent, _, context) => {
+      const results = await context.f4bDs.queryPorts();
+      return results;
     },
-    lineTypes: async () => {
-      await connectToPool();
-      const results = await pool.query`SELECT l.LinijaTipOznaka as id, l.LinijaTipNaziv as name FROM BOOK.LinijaTip l ORDER BY l.LinijaTipOznaka`;
-      return results.recordset;
+    lineTypes: async (_parent, _, context) => {
+      const results = await context.f4bDs.queryLineTypes();
+      return results;
     },
-    linesByType: async (_, { lineTypeId }) => {
-      await connectToPool();
-      console.log(lineTypeId);
-      const results = await pool.query`SELECT l.LinijaOznaka as id, l.LinijaNaziv as name  FROM BOOK.LinijaGlava l INNER JOIN BOOK.LinijaTip lt ON l.LinijaTipId=lt.LinijaTipId  WHERE lt.LinijaTipOznaka=${lineTypeId} ORDER BY l.LinijaOznaka`;
-      return results.recordset;
+    linesByType: async (_, { lineTypeId }, _context) => {
+      const results = _context.f4bDs.queryLinesByType(lineTypeId);
+      return results;
+    },
+    vesselItinerary: async (
+      parent,
+      { vesselId, startDate, pageNumber },
+      context
+    ) => {
+      console.log(parent);
+      const results = await context.f4bDs.queryVesselItinerary(
+        vesselId,
+        startDate,
+        pageNumber
+      );
+      return results;
     }
   },
   Line: {
-    type: async obj => {
-      await connectToPool();
-      const results = await pool.query`SELECT lt.LinijaTipOznaka as id, lt.LinijaTipNaziv  as name FROM BOOK.LinijaTip lt INNER JOIN BOOK.LinijaGlava lg ON lt.LinijaTipId=lg.LinijaTipId WHERE lg.LinijaOznaka=${
-        obj.id
-      }`;
-      return results.recordset[0];
+    type: async (obj, _, context) => {
+      const results = await context.f4bDs.queryLineTypeByLineId();
+      return results;
     }
   },
   Island: {
-    ports: async obj => {
-      await connectToPool();
-      const results = await pool.query`
-      SELECT p.PostajaOznaka as id,p.PostajaNaziv as name,p.PostajaAdresa as CIMISId 
-      FROM BOOK.PostajaGlava p
-      INNER JOIN dbo.BussPart bp ON p.DProtocolIDOtok = bp.BussPartID
-      WHERE bp.BpCode = ${obj.id}`;
-
-      return results.recordset;
+    ports: async (obj, _, context) => {
+      const results = await context.f4bDs.queryPortsByIslandId(obj.id);
+      return results;
+    }
+  },
+  Journey: {
+    departurePort: async (parent, _, context) => {
+      const results = await context.f4bDs.queryPortById(parent.departurePortId);
+      return results;
+    },
+    destinationPort: async (parent, _, context) => {
+      const results = await context.f4bDs.queryPortById(
+        parent.destinationPortId
+      );
+      return results;
+    },
+    vessel: async (parent, _, context) => {
+      console.log({ vesselParent: parent });
+      const results = await context.f4bDs.queryVesselById(parent.vesselId);
+      return results;
+    },
+    line: async (parent, _, context) => {
+      const results = await context.f4bDs.queryLineById(parent.lineId);
+      return results;
     }
   }
   // Mutation: {
